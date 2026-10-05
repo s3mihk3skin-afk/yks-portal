@@ -20,10 +20,10 @@
     }
   </script>
 </head>
-<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased">
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased flex flex-col justify-between">
 
   <!-- HEADER -->
-  <header class="sticky top-0 z-50 backdrop-blur-md bg-darkbg/80 border-b border-slate-800">
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-darkbg/80 border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-black text-xl shadow-lg shadow-brand-500/30">YKS</div>
@@ -41,8 +41,9 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
-    <!-- SAYAÇLAR -->
+  <!-- ANA İÇERİK -->
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8 flex-1 w-full">
+    <!-- SAYAÇ VE KRONOMETRE -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="md:col-span-2 bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl">
         <div class="flex items-center justify-between mb-4">
@@ -60,9 +61,9 @@
         <h2 class="text-sm font-bold text-slate-300"><i class="fa-solid fa-stopwatch text-brand-500 mr-2"></i> Çalışma Kronometresi</h2>
         <div class="text-center my-4"><span id="timer-display" class="text-5xl font-black font-mono text-white">25:00</span></div>
         <div class="flex gap-2">
-          <button onclick="startTimer()" class="flex-1 py-2 bg-emerald-600 text-white font-semibold rounded-xl text-sm">Başlat</button>
-          <button onclick="pauseTimer()" class="py-2 px-3 bg-amber-600 text-white font-semibold rounded-xl text-sm"><i class="fa-solid fa-pause"></i></button>
-          <button onclick="resetTimer()" class="py-2 px-3 bg-slate-700 text-white font-semibold rounded-xl text-sm"><i class="fa-solid fa-rotate-right"></i></button>
+          <button onclick="startTimer()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-sm transition">Başlat</button>
+          <button onclick="pauseTimer()" class="py-2 px-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl text-sm transition"><i class="fa-solid fa-pause"></i></button>
+          <button onclick="resetTimer()" class="py-2 px-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl text-sm transition"><i class="fa-solid fa-rotate-right"></i></button>
         </div>
       </div>
     </div>
@@ -90,26 +91,49 @@
     </section>
   </main>
 
-  <!-- GİRİŞ / KAYIT MODALİ -->
+  <!-- İLETİŞİM & FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-900/50 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>
+        <p class="font-semibold text-slate-300">YKS Portal &copy; 2026</p>
+        <p>YKS Hazırlık Sürecinde Kişisel Çalışma Paneli</p>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+        <i class="fa-solid fa-envelope text-brand-500"></i>
+        <span>İletişim: <a href="mailto:semihkeskin@gmail.com" class="text-slate-200 underline hover:text-brand-500 transition">semihkeskin@gmail.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- GİRİŞ / KAYIT MODALI -->
   <div id="auth-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-cardbg border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative">
       <button onclick="toggleAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-      <h3 class="text-xl font-bold mb-4 text-white">Hesabına Giriş Yap / Kaydol</h3>
-      <div class="space-y-3">
-        <input type="email" id="auth-email" placeholder="E-posta Adresin" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-brand-500">
-        <input type="password" id="auth-password" placeholder="Şifren" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-brand-500">
-        <button onclick="handleAuth('login')" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm transition">Giriş Yap</button>
-        <button onclick="handleAuth('register')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold text-sm transition">Yeni Hesap Oluştur</button>
+      <h3 class="text-xl font-bold mb-1 text-white">YKS Portal'a Hoş Geldin</h3>
+      <p class="text-xs text-slate-400 mb-6">Hesabınla giriş yap veya yeni bir hesap oluştur.</p>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">E-Posta Adresi</label>
+          <input type="email" id="auth-email" placeholder="ornek@gmail.com" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Şifre</label>
+          <input type="password" id="auth-password" placeholder="••••••••" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-brand-500">
+        </div>
+        <div class="pt-2 space-y-2">
+          <button onclick="handleAuth('login')" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm transition shadow-lg shadow-brand-600/20">Giriş Yap</button>
+          <button onclick="handleAuth('register')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold text-sm transition border border-slate-700">Yeni Hesap Oluştur</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- FIREBASE SDK -->
+  <!-- FIREBASE SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // SENİN PROJENE ÖZEL BİLGİLER YERLEŞTİRİLDİ
     const firebaseConfig = {
       apiKey: "AIzaSyC6vFLRTgJvhRnZjk82hwjDVvls0nYBQA",
       authDomain: "yks-kocluk-portal.firebaseapp.com",
@@ -127,28 +151,55 @@
       const profileBar = document.getElementById('user-profile-bar');
       if (user) {
         profileBar.innerHTML = `
-          <span class="text-xs font-semibold bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-emerald-400">👤 ${user.email.split('@')[0]}</span>
-          <button onclick="window.logout()" class="px-3 py-1.5 text-xs bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition">Çıkış</button>
+          <span class="text-xs font-semibold bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-emerald-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-user"></i> ${user.email.split('@')[0]}
+          </span>
+          <button onclick="window.logout()" class="px-3 py-1.5 text-xs bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition">Çıkış Yap</button>
         `;
       } else {
-        profileBar.innerHTML = `<button onclick="toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 text-white"><i class="fa-solid fa-user"></i> Giriş Yap / Kaydol</button>`;
+        profileBar.innerHTML = `
+          <button onclick="toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center gap-2">
+            <i class="fa-solid fa-user"></i> Giriş Yap / Kaydol
+          </button>
+        `;
       }
     });
 
     window.handleAuth = async (type) => {
       const email = document.getElementById('auth-email').value;
       const pass = document.getElementById('auth-password').value;
+      
+      if (!email || !pass) {
+        alert("Lütfen e-posta ve şifrenizi girin.");
+        return;
+      }
+
       try {
-        if (type === 'login') await signInWithEmailAndPassword(auth, email, pass);
-        else await createUserWithEmailAndPassword(auth, email, pass);
+        if (type === 'login') {
+          await signInWithEmailAndPassword(auth, email, pass);
+          alert("Giriş başarılı!");
+        } else {
+          await createUserWithEmailAndPassword(auth, email, pass);
+          alert("Hesap başarıyla oluşturuldu ve giriş yapıldı!");
+        }
         toggleAuthModal();
-      } catch (err) { alert("Hata: " + err.message); }
+      } catch (err) {
+        alert("Hata: " + err.message);
+      }
     };
 
     window.logout = () => signOut(auth);
   </script>
 
+  <!-- UYGULAMA MANTIĞI -->
   <script>
+    function toggleAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      if (modal) {
+        modal.classList.toggle('hidden');
+      }
+    }
+
     const curriculum = {
       tyt: {
         "Matematik": ["Temel Kavramlar", "Sayı Basamakları", "Bölme - Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Sayı-Kesir Problemleri", "Yaş Problemleri", "Yüzde-Kâr-Zarar Problemleri", "Karışım Problemleri", "Hız Problemleri", "Kümeler - Mantık", "Fonksiyonlar", "Permütasyon - Kombinasyon", "Olasılık"],
@@ -174,7 +225,7 @@
       Object.keys(curriculum[currentExam]).forEach(subj => {
         const isActive = subj === currentSubject;
         const btn = document.createElement('button');
-        btn.className = `px-4 py-2 text-xs font-semibold rounded-xl border ${isActive ? 'bg-brand-600 text-white border-brand-500' : 'bg-slate-900 text-slate-400 border-slate-800'}`;
+        btn.className = `px-4 py-2 text-xs font-semibold rounded-xl border transition ${isActive ? 'bg-brand-600 text-white border-brand-500' : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'}`;
         btn.innerText = subj;
         btn.onclick = () => { currentSubject = subj; loadSubjects(); loadTopics(); };
         selector.appendChild(btn);
@@ -194,9 +245,9 @@
         if (isChecked) doneCount++;
 
         const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer ${isChecked ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300' : 'bg-slate-900/50 border-slate-800 text-slate-300'}`;
+        card.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${isChecked ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300' : 'bg-slate-900/50 border-slate-800 text-slate-300 hover:border-slate-700'}`;
         card.onclick = () => toggleTopic(key);
-        card.innerHTML = `<span class="text-xs font-medium">${topic}</span><div class="w-5 h-5 rounded border flex items-center justify-center text-xs ${isChecked ? 'bg-emerald-500 text-slate-950' : 'border-slate-700'}">${isChecked ? '✓' : ''}</div>`;
+        card.innerHTML = `<span class="text-xs font-medium">${topic}</span><div class="w-5 h-5 rounded border flex items-center justify-center text-xs ${isChecked ? 'bg-emerald-500 text-slate-950 font-bold' : 'border-slate-700'}">${isChecked ? '✓' : ''}</div>`;
         topicList.appendChild(card);
       });
 
@@ -214,14 +265,14 @@
     function switchExamTab(exam) {
       currentExam = exam;
       currentSubject = Object.keys(curriculum[currentExam])[0];
+      
+      document.getElementById('tab-tyt').className = exam === 'tyt' ? 'px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white' : 'px-5 py-2 text-xs font-bold rounded-lg text-slate-400';
+      document.getElementById('tab-ayt').className = exam === 'ayt' ? 'px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white' : 'px-5 py-2 text-xs font-bold rounded-lg text-slate-400';
+
       loadSubjects(); loadTopics();
     }
 
-    function toggleAuthModal() {
-      document.getElementById('auth-modal').classList.toggle('hidden');
-    }
-
-    // SAYAC LOGIC
+    // YKS GERİ SAYIM
     const targetDate = new Date("June 20, 2027 10:15:00").getTime();
     setInterval(() => {
       const diff = targetDate - new Date().getTime();
@@ -233,6 +284,7 @@
       }
     }, 1000);
 
+    // KRONOMETRE
     let timerInterval = null, secondsLeft = 1500;
     function startTimer() {
       if (timerInterval) return;
@@ -246,7 +298,10 @@
     function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
     function resetTimer() { pauseTimer(); secondsLeft = 1500; document.getElementById('timer-display').innerText = "25:00"; }
 
-    loadSubjects(); loadTopics();
+    window.onload = () => {
+      loadSubjects(); 
+      loadTopics();
+    };
   </script>
 </body>
 </html>
