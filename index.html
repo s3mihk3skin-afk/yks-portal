@@ -18,6 +18,14 @@
         }
       }
     }
+
+    // Modal açma-kapama fonksiyonunu en tepeye aldık (Tıklama hatasını kesin çözer)
+    window.toggleAuthModal = function() {
+      const modal = document.getElementById('auth-modal');
+      if (modal) {
+        modal.classList.toggle('hidden');
+      }
+    };
   </script>
 </head>
 <body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased flex flex-col justify-between">
@@ -34,7 +42,7 @@
       </div>
 
       <div id="user-profile-bar" class="flex items-center gap-3">
-        <button onclick="toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center gap-2">
+        <button onclick="window.toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center gap-2">
           <i class="fa-solid fa-user"></i> Giriş Yap / Kaydol
         </button>
       </div>
@@ -108,7 +116,7 @@
   <!-- GİRİŞ / KAYIT MODALI -->
   <div id="auth-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-cardbg border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative">
-      <button onclick="toggleAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      <button onclick="window.toggleAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       <h3 class="text-xl font-bold mb-1 text-white">YKS Portal'a Hoş Geldin</h3>
       <p class="text-xs text-slate-400 mb-6">Hesabınla giriş yap veya yeni bir hesap oluştur.</p>
       
@@ -158,7 +166,7 @@
         `;
       } else {
         profileBar.innerHTML = `
-          <button onclick="toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center gap-2">
+          <button onclick="window.toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center gap-2">
             <i class="fa-solid fa-user"></i> Giriş Yap / Kaydol
           </button>
         `;
@@ -182,7 +190,7 @@
           await createUserWithEmailAndPassword(auth, email, pass);
           alert("Hesap başarıyla oluşturuldu ve giriş yapıldı!");
         }
-        toggleAuthModal();
+        window.toggleAuthModal();
       } catch (err) {
         alert("Hata: " + err.message);
       }
@@ -193,13 +201,6 @@
 
   <!-- UYGULAMA MANTIĞI -->
   <script>
-    function toggleAuthModal() {
-      const modal = document.getElementById('auth-modal');
-      if (modal) {
-        modal.classList.toggle('hidden');
-      }
-    }
-
     const curriculum = {
       tyt: {
         "Matematik": ["Temel Kavramlar", "Sayı Basamakları", "Bölme - Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Sayı-Kesir Problemleri", "Yaş Problemleri", "Yüzde-Kâr-Zarar Problemleri", "Karışım Problemleri", "Hız Problemleri", "Kümeler - Mantık", "Fonksiyonlar", "Permütasyon - Kombinasyon", "Olasılık"],
