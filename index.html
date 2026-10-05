@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YKS Portal | Tam Kapsamlı Hazırlık Platformu</title>
+  <!-- Tailwind CSS (Arayüz Kütüphanesi) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome İkon Seti -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eepf2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
+            darkbg: '#0f172a',
+            cardbg: '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- ÜST NAVIGASYON / HEADER -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-darkbg/80 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-black text-xl shadow-lg shadow-brand-500/30">
+          YKS
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-none bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">YKS Portal</h1>
+          <span class="text-[10px] text-brand-500 font-semibold uppercase tracking-wider">Hedef Derece</span>
+        </div>
+      </div>
+
+      <!-- Kullanıcı Giriş / Profil Alanı -->
+      <div id="user-profile-bar" class="flex items-center gap-3">
+        <button onclick="openAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition shadow-lg shadow-brand-600/20 flex items-center gap-2">
+          <i class="fa-solid fa-user-plus"></i> Giriş Yap / Kaydol
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- ÜST BİLGİ VE SAYAÇ KARTLARI -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- CANLI YKS GERİ SAYIM -->
+      <div class="md:col-span-2 bg-cardbg rounded-2xl p-6 border border-slate-800 relative overflow-hidden shadow-xl">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full border border-brand-500/20">
+            <i class="fa-regular fa-clock mr-1"></i> Sınav Sayacı
+          </span>
+          <span class="text-xs text-slate-400">YKS Hedef Tarihi</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2 text-center my-2" id="countdown-grid">
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span id="cd-days" class="text-2xl sm:text-4xl font-black text-white">00</span>
+            <p class="text-[10px] sm:text-xs text-slate-400 mt-1 uppercase">Gün</p>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span id="cd-hours" class="text-2xl sm:text-4xl font-black text-white">00</span>
+            <p class="text-[10px] sm:text-xs text-slate-400 mt-1 uppercase">Saat</p>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span id="cd-mins" class="text-2xl sm:text-4xl font-black text-white">00</span>
+            <p class="text-[10px] sm:text-xs text-slate-400 mt-1 uppercase">Dakika</p>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span id="cd-secs" class="text-2xl sm:text-4xl font-black text-brand-500">00</span>
+            <p class="text-[10px] sm:text-xs text-slate-400 mt-1 uppercase">Saniye</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- POMODORO DERS ÇALIŞMA SAYACI -->
+      <div class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-300"><i class="fa-solid fa-stopwatch text-brand-500 mr-2"></i> Çalışma Kronometresi</h2>
+          <span id="timer-status" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Hazır</span>
+        </div>
+        <div class="text-center my-4">
+          <span id="timer-display" class="text-5xl font-black font-mono tracking-tight text-white">25:00</span>
+        </div>
+        <div class="flex gap-2">
+          <button id="btn-start" onclick="startTimer()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition text-sm flex items-center justify-center gap-1">
+            <i class="fa-solid fa-play text-xs"></i> Başlat
+          </button>
+          <button onclick="pauseTimer()" class="py-2.5 px-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl transition text-sm">
+            <i class="fa-solid fa-pause"></i>
+          </button>
+          <button onclick="resetTimer()" class="py-2.5 px-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition text-sm">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MÜFREDAT KONTROL VE KONU TAKİP BÖLÜMÜ -->
+    <section class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-brand-500"></i> TYT & AYT Müfredat Takibi
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Bitirdiğin konuları işaretle, ilerleme durumunu anlık takip et.</p>
+        </div>
+
+        <!-- TYT / AYT TAB BUTONLARI -->
+        <div class="flex p-1 bg-slate-900 rounded-xl border border-slate-800">
+          <button id="tab-tyt" onclick="switchExamTab('tyt')" class="px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white transition">TYT Müfredatı</button>
+          <button id="tab-ayt" onclick="switchExamTab('ayt')" class="px-5 py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition">AYT Müfredatı</button>
+        </div>
+      </div>
+
+      <!-- DERS SEÇİM MENÜSÜ -->
+      <div id="subject-selector" class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+        <!-- JS ile dinamik ders butonları buraya doldurulacak -->
+      </div>
+
+      <!-- KONU LİSTESİ VE İLERLEME ÇUBUĞU -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span id="active-subject-title" class="font-bold text-slate-200">Matematik Konuları</span>
+          <span id="progress-text">0 / 0 Tamamlandı (%0)</span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-600 to-emerald-400 w-0 transition-all duration-300"></div>
+        </div>
+
+        <div id="topic-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+          <!-- Konu kartları JS ile buraya yüklenecek -->
+        </div>
+      </div>
+    </section>
+
+    <!-- İLETİŞİM VE GELİŞTİRİCİ BİLGİ KARTI -->
+    <footer class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-brand-600/20 border border-brand-500/30 flex items-center justify-center text-brand-400">
+          <i class="fa-solid fa-code"></i>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-200">YKS Portal Geliştirici İletişim</p>
+          <p>Her türlü soru, öneri ve destek için ulaşabilirsin.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="mailto:iletisim@yksportal.com" class="hover:text-brand-400 transition flex items-center gap-1.5"><i class="fa-solid fa-envelope"></i> E-posta</a>
+        <a href="#" class="hover:text-brand-400 transition flex items-center gap-1.5"><i class="fa-brands fa-telegram"></i> Telegram Topluluğu</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- JAVASCRIPT & MÜFREDAT VERİSİ -->
+  <script>
+    // VERİ TABANI: TÜM TYT VE AYT MÜFREDATI
+    const curriculum = {
+      tyt: {
+        "Matematik": ["Temel Kavramlar", "Sayı Basamakları", "Bölme - Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Sayı-Kesir Problemleri", "Yaş Problemleri", "Yüzde-Kâr-Zarar Problemleri", "Karışım Problemleri", "Hız Problemleri", "Kümeler - Mantık", "Fonksiyonlar", "Permütasyon - Kombinasyon", "Olasılık", "Veri - İstatistik"],
+        "Türkçe": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Yazım Kuralları", "Noktalama İşaretleri", "Sözcükte Yapı", "İsimler / Sıfatlar", "Zamirler / Zarflar", "Edat - Bağlaç - Ünlem", "Fiiller ve Fiilimsiler", "Cümlenin Ögeleri", "Cümle Türleri", "Anlatım Bozuklukları"],
+        "Fizik": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "İş, Güç ve Enerji", "Elektrostatik", "Elektrik ve Magnetizma", "Optik", "Dalgalar"],
+        "Kimya": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Halleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Mol Kavramı", "Tepkime Türleri ve Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
+        "Biyoloji": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller", "Hücre Zarından Madde Geçişi", "Canlıların Sınıflandırılması", "Hücre Bölünmeleri ve Üreme", "Kalıtım", "Ekosistem Ekolojisi"]
+      },
+      ayt: {
+        "Matematik": ["Polinomlar", "2. Dereceden Denklemler", "Karmaşık Sayılar", "Parabol", "Eşitsizlikler", "Trigonometri", "Logaritma", "Diziler", "Limit ve Süreklilik", "Türev ve Uygulamaları", "İntegral ve Uygulamaları"],
+        "Fizik": ["Vektörler", "Bağıl Hareket", "Newton'un Hareket Yasaları", "Bir Boyutta Sabit İvmeli Hareket", "Atışlar", "İş, Güç, Enerji", "İtme ve Çizgisel Momentum", "Tork ve Denge", "Basit Makineler", "Elektriksel Kuvvet ve Potansiyel", "Düzgün Çembersel Hareket", "Basit Harmonik Hareket", "Dalga Mekaniği", "Modern Fizik"],
+        "Kimya": ["Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler ve Derişim", "Kimyasal Tepkimelerde Enerji", "Tepkime Hızları", "Kimyasal Denge", "Asit-Baz Dengesi", "Çözünürlük Dengesi (KÇÇ)", "Kimya ve Elektrik", "Organik Kimyaya Giriş", "Organik Bileşikler"],
+        "Biyoloji": ["İnsan Fizyolojisi ve Sistemler", "Sinir Sistemi", "Duyu Organları", "Destek ve Hareket Sistemi", "Sindirim Sistemi", "Dolaşım ve Lenf Sistemi", "Solunum Sistemi", "Boşaltım Sistemi", "Genden Proteine", "Nükleik Asitler", "Protein Sentezi", "Canlılarda Enerji Dönüşümleri", "Bitki Biyolojisi", "Canlılar ve Çevre"]
+      }
+    };
+
+    let currentExam = 'tyt';
+    let currentSubject = 'Matematik';
+    let completedTopics = JSON.parse(localStorage.getItem('yks_completed_topics') || '{}');
+
+    // MÜFREDAT SAYFA YÜKLEMESİ
+    function loadSubjects() {
+      const selector = document.getElementById('subject-selector');
+      selector.innerHTML = '';
+      const subjects = Object.keys(curriculum[currentExam]);
+
+      subjects.forEach((subj, idx) => {
+        if (idx === 0 && !subjects.includes(currentSubject)) currentSubject = subj;
+        const isActive = subj === currentSubject;
+        const btn = document.createElement('button');
+        btn.className = `px-4 py-2 text-xs font-semibold rounded-xl whitespace-nowrap transition flex items-center gap-2 border ${isActive ? 'bg-brand-600 text-white border-brand-500 shadow-md shadow-brand-600/20' : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'}`;
+        btn.innerText = subj;
+        btn.onclick = () => { currentSubject = subj; loadSubjects(); loadTopics(); };
+        selector.appendChild(btn);
+      });
+    }
+
+    function loadTopics() {
+      const topicList = document.getElementById('topic-list');
+      document.getElementById('active-subject-title').innerText = `${currentExam.toUpperCase()} ${currentSubject} Konuları`;
+      topicList.innerHTML = '';
+
+      const topics = curriculum[currentExam][currentSubject] || [];
+      let doneCount = 0;
+
+      topics.forEach(topic => {
+        const key = `${currentExam}_${currentSubject}_${topic}`;
+        const isChecked = !!completedTopics[key];
+        if (isChecked) doneCount++;
+
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-xl border transition flex items-center justify-between cursor-pointer ${isChecked ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300' : 'bg-slate-900/50 border-slate-800/80 text-slate-300 hover:border-slate-700'}`;
+        card.onclick = () => toggleTopic(key);
+
+        card.innerHTML = `
+          <span class="text-xs font-medium">${topic}</span>
+          <div class="w-5 h-5 rounded-md border flex items-center justify-center text-xs transition ${isChecked ? 'bg-emerald-500 border-emerald-400 text-slate-950' : 'border-slate-700 bg-slate-800'}">
+            ${isChecked ? '<i class="fa-solid fa-check"></i>' : ''}
+          </div>
+        `;
+        topicList.appendChild(card);
+      });
+
+      // İlerleme Çubuğu Güncelleme
+      const total = topics.length;
+      const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+      document.getElementById('progress-text').innerText = `${doneCount} / ${total} Tamamlandı (%${pct})`;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+    }
+
+    function toggleTopic(key) {
+      completedTopics[key] = !completedTopics[key];
+      localStorage.setItem('yks_completed_topics', JSON.stringify(completedTopics));
+      loadTopics();
+    }
+
+    function switchExamTab(exam) {
+      currentExam = exam;
+      document.getElementById('tab-tyt').className = exam === 'tyt' ? 'px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white transition' : 'px-5 py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition';
+      document.getElementById('tab-ayt').className = exam === 'ayt' ? 'px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white transition' : 'px-5 py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition';
+      currentSubject = Object.keys(curriculum[currentExam])[0];
+      loadSubjects();
+      loadTopics();
+    }
+
+    // YKS GERİ SAYIM LOGIC
+    const targetDate = new Date("June 20, 2027 10:15:00").getTime();
+    setInterval(() => {
+      const now = new Date().getTime();
+      const diff = targetDate - now;
+      if (diff > 0) {
+        document.getElementById('cd-days').innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+        document.getElementById('cd-hours').innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+        document.getElementById('cd-mins').innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+        document.getElementById('cd-secs').innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+      }
+    }, 1000);
+
+    // POMODORO TIMER LOGIC
+    let timerInterval = null;
+    let secondsLeft = 25 * 60;
+
+    function updateTimerUI() {
+      const m = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+      const s = String(secondsLeft % 60).padStart(2, '0');
+      document.getElementById('timer-display').innerText = `${m}:${s}`;
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      document.getElementById('timer-status').innerText = 'Çalışılıyor...';
+      document.getElementById('timer-status').className = 'text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20';
+      timerInterval = setInterval(() => {
+        if (secondsLeft > 0) {
+          secondsLeft--;
+          updateTimerUI();
+        } else {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          alert("Süre doldu! Mola verebilirsin.");
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('timer-status').innerText = 'Duraklatıldı';
+      document.getElementById('timer-status').className = 'text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20';
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      secondsLeft = 25 * 60;
+      updateTimerUI();
+      document.getElementById('timer-status').innerText = 'Hazır';
+      document.getElementById('timer-status').className = 'text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded';
+    }
+
+    // SAYFA İLK YÜKLEME
+    loadSubjects();
+    loadTopics();
+  </script>
+</body>
+</html>
