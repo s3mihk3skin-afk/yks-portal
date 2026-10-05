@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YKS Portal | Tam Kapsamlı Hazırlık Platformu</title>
+  <title>YKS Portal | Tam Kapsamlı Hazırlık ve Analiz Platformu</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Grafik Kütüphanesi Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -19,84 +21,188 @@
       }
     }
 
-    // Modal açma-kapama fonksiyonunu en tepeye aldık (Tıklama hatasını kesin çözer)
     window.toggleAuthModal = function() {
       const modal = document.getElementById('auth-modal');
-      if (modal) {
-        modal.classList.toggle('hidden');
-      }
+      if (modal) modal.classList.toggle('hidden');
     };
   </script>
 </head>
 <body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased flex flex-col justify-between">
 
   <!-- HEADER -->
-  <header class="sticky top-0 z-40 backdrop-blur-md bg-darkbg/80 border-b border-slate-800">
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-darkbg/90 border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-black text-xl shadow-lg shadow-brand-500/30">YKS</div>
         <div>
           <h1 class="font-bold text-lg bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">YKS Portal</h1>
-          <span class="text-[10px] text-brand-500 font-semibold uppercase">Hedef Derece</span>
+          <span class="text-[10px] text-brand-500 font-semibold uppercase">Akıllı Koçluk System</span>
         </div>
       </div>
 
+      <!-- ANA NAVİGASYON MENÜSÜ -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
+        <button onclick="switchMainTab('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-lg bg-brand-600 text-white transition"><i class="fa-solid fa-chart-pie mr-1.5"></i>Genel Bakış</button>
+        <button onclick="switchMainTab('net-tracker')" id="nav-net-tracker" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition"><i class="fa-solid fa-chart-line mr-1.5"></i>Net Grafikleri</button>
+        <button onclick="switchMainTab('exam-log')" id="nav-exam-log" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition"><i class="fa-solid fa-book-bookmark mr-1.5"></i>Deneme Defteri</button>
+        <button onclick="switchMainTab('curriculum')" id="nav-curriculum" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition"><i class="fa-solid fa-list-check mr-1.5"></i>Müfredat Takibi</button>
+      </nav>
+
       <div id="user-profile-bar" class="flex items-center gap-3">
         <button onclick="window.toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center gap-2">
-          <i class="fa-solid fa-user"></i> Giriş Yap / Kaydol
+          <i class="fa-solid fa-user"></i> Giriş Yap
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ANA İÇERİK -->
-  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8 flex-1 w-full">
-    <!-- SAYAÇ VE KRONOMETRE -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="md:col-span-2 bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-bold uppercase text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full border border-brand-500/20">⏳ YKS Geri Sayım</span>
+  <!-- MOBİL NAVİGASYON -->
+  <div class="md:hidden flex overflow-x-auto gap-2 p-2 bg-slate-900 border-b border-slate-800 text-xs">
+    <button onclick="switchMainTab('dashboard')" class="px-3 py-2 rounded-lg bg-brand-600 text-white whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-1"></i>Genel Bakış</button>
+    <button onclick="switchMainTab('net-tracker')" class="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 whitespace-nowrap"><i class="fa-solid fa-chart-line mr-1"></i>Net Grafiği</button>
+    <button onclick="switchMainTab('exam-log')" class="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 whitespace-nowrap"><i class="fa-solid fa-book-bookmark mr-1"></i>Denemeler</button>
+    <button onclick="switchMainTab('curriculum')" class="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 whitespace-nowrap"><i class="fa-solid fa-list-check mr-1"></i>Müfredat</button>
+  </div>
+
+  <!-- ANA İÇERİK ALANI -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+
+    <!-- 1. SEKME: GENEL BAKIŞ (DASHBOARD) -->
+    <div id="tab-dashboard-content" class="space-y-8">
+      <!-- Sayaç ve Kronometre -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2 bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase text-brand-500 bg-brand-500/10 px-3 py-1 rounded-full border border-brand-500/20">⏳ YKS Geri Sayım</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2 text-center" id="countdown-grid">
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-days" class="text-2xl sm:text-4xl font-black">00</span><p class="text-[10px] text-slate-400">Gün</p></div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-hours" class="text-2xl sm:text-4xl font-black">00</span><p class="text-[10px] text-slate-400">Saat</p></div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-mins" class="text-2xl sm:text-4xl font-black">00</span><p class="text-[10px] text-slate-400">Dakika</p></div>
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-secs" class="text-2xl sm:text-4xl font-black text-brand-500">00</span><p class="text-[10px] text-slate-400">Saniye</p></div>
+          </div>
         </div>
-        <div class="grid grid-cols-4 gap-2 text-center" id="countdown-grid">
-          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-days" class="text-2xl sm:text-4xl font-black">00</span><p class="text-[10px] text-slate-400">Gün</p></div>
-          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-hours" class="text-2xl sm:text-4xl font-black">00</span><p class="text-[10px] text-slate-400">Saat</p></div>
-          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-mins" class="text-2xl sm:text-4xl font-black">00</span><p class="text-[10px] text-slate-400">Dakika</p></div>
-          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800"><span id="cd-secs" class="text-2xl sm:text-4xl font-black text-brand-500">00</span><p class="text-[10px] text-slate-400">Saniye</p></div>
+
+        <div class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between">
+          <h2 class="text-sm font-bold text-slate-300"><i class="fa-solid fa-stopwatch text-brand-500 mr-2"></i> Pomodoro Kronometresi</h2>
+          <div class="text-center my-4"><span id="timer-display" class="text-5xl font-black font-mono text-white">25:00</span></div>
+          <div class="flex gap-2">
+            <button onclick="startTimer()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-sm transition">Başlat</button>
+            <button onclick="pauseTimer()" class="py-2 px-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl text-sm transition"><i class="fa-solid fa-pause"></i></button>
+            <button onclick="resetTimer()" class="py-2 px-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl text-sm transition"><i class="fa-solid fa-rotate-right"></i></button>
+          </div>
         </div>
       </div>
 
-      <div class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between">
-        <h2 class="text-sm font-bold text-slate-300"><i class="fa-solid fa-stopwatch text-brand-500 mr-2"></i> Çalışma Kronometresi</h2>
-        <div class="text-center my-4"><span id="timer-display" class="text-5xl font-black font-mono text-white">25:00</span></div>
-        <div class="flex gap-2">
-          <button onclick="startTimer()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-sm transition">Başlat</button>
-          <button onclick="pauseTimer()" class="py-2 px-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl text-sm transition"><i class="fa-solid fa-pause"></i></button>
-          <button onclick="resetTimer()" class="py-2 px-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl text-sm transition"><i class="fa-solid fa-rotate-right"></i></button>
+      <!-- Günlük Soru Hedef Takibi -->
+      <div class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-bullseye text-brand-500"></i> Günlük Soru Sayacı & Hedef</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-400 mb-1">Günlük Soru Hedefi</p>
+            <input type="number" id="daily-target" value="200" onchange="updateQuestionTracker()" class="bg-slate-800 border border-slate-700 rounded-lg p-2 w-full text-white font-bold">
+          </div>
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-400 mb-1">Bugün Çözülen</p>
+            <input type="number" id="daily-solved" value="0" onchange="updateQuestionTracker()" class="bg-slate-800 border border-slate-700 rounded-lg p-2 w-full text-emerald-400 font-bold">
+          </div>
+          <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div class="flex justify-between text-xs text-slate-400 mb-2">
+              <span>Hedef İlerlemesi</span>
+              <span id="target-percentage" class="text-brand-500 font-bold">%0</span>
+            </div>
+            <div class="w-full bg-slate-800 h-4 rounded-full overflow-hidden">
+              <div id="target-bar" class="bg-gradient-to-r from-brand-600 to-emerald-400 h-full w-0 transition-all duration-500"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- MÜFREDAT -->
-    <section class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl space-y-6">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-list-check text-brand-500 mr-2"></i> TYT & AYT Müfredat Takibi</h2>
-        <div class="flex p-1 bg-slate-900 rounded-xl border border-slate-800">
-          <button id="tab-tyt" onclick="switchExamTab('tyt')" class="px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white">TYT Müfredatı</button>
-          <button id="tab-ayt" onclick="switchExamTab('ayt')" class="px-5 py-2 text-xs font-bold rounded-lg text-slate-400">AYT Müfredatı</button>
+    <!-- 2. SEKME: NET ANALİZİ VE GRAFİKLER -->
+    <div id="tab-net-tracker-content" class="hidden space-y-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Net Ekleme Formu -->
+        <div class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
+          <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-plus-circle text-brand-500 mr-2"></i> Yeni Deneme Neti Ekle</h3>
+          
+          <div>
+            <label class="text-xs text-slate-400">Sınav Türü</label>
+            <select id="net-exam-type" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white mt-1">
+              <option value="TYT">TYT Denemesi</option>
+              <option value="AYT">AYT Denemesi</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Deneme Adı / Yayın</label>
+            <input type="text" id="net-exam-name" placeholder="Örn: 3D Türkiye Geneli 1" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Toplam Net</label>
+            <input type="number" step="0.25" id="net-total" placeholder="Örn: 85.5" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white mt-1">
+          </div>
+          <button onclick="addNetRecord()" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl text-sm transition">Grafiğe Ekle</button>
+        </div>
+
+        <!-- Grafik Ekranı -->
+        <div class="lg:col-span-2 bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-chart-line text-emerald-400 mr-2"></i> Net Gelişim Grafiğin</h3>
+            <span class="text-xs text-slate-400">Son Girilen Netler</span>
+          </div>
+          <div class="h-64 w-full">
+            <canvas id="netChart"></canvas>
+          </div>
         </div>
       </div>
-      <div id="subject-selector" class="flex gap-2 overflow-x-auto pb-2"></div>
-      <div class="space-y-4">
-        <div class="flex justify-between text-xs text-slate-400">
-          <span id="active-subject-title" class="font-bold text-slate-200">Matematik Konuları</span>
-          <span id="progress-text">0 / 0 Tamamlandı (%0)</span>
+    </div>
+
+    <!-- 3. SEKME: DENEME DEFTERİ & YANLIŞ ANALİZİ -->
+    <div id="tab-exam-log-content" class="hidden space-y-8">
+      <div class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl space-y-6">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-book-open text-brand-500"></i> Yanlış Soru & Analiz Defteri</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input type="text" id="mistake-subject" placeholder="Ders / Konu (Örn: Mat - Türev)" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm text-white">
+          <select id="mistake-reason" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm text-white">
+            <option value="Konu Eksiği">Hata Neden: Konu Eksiği</option>
+            <option value="Dikkat Hatası">Hata Neden: Dikkat Hatası</option>
+            <option value="Süre Yetmedi">Hata Neden: Süre Yetmedi</option>
+            <option value="Soru Tipi Bilinmiyor">Hata Neden: Soru Tipi Bilinmiyor</option>
+          </select>
+          <button onclick="addMistakeNote()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm p-3 transition">Analiz Notu Ekle</button>
         </div>
-        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-          <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-600 to-emerald-400 w-0 transition-all duration-300"></div>
+
+        <div class="space-y-3" id="mistake-list">
+          <p class="text-xs text-slate-500 italic">Henüz kaydedilmiş bir analiz notu yok.</p>
         </div>
-        <div id="topic-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
       </div>
-    </section>
+    </div>
+
+    <!-- 4. SEKME: MÜFREDAT TAKİBİ -->
+    <div id="tab-curriculum-content" class="hidden space-y-8">
+      <section class="bg-cardbg rounded-2xl p-6 border border-slate-800 shadow-xl space-y-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-list-check text-brand-500 mr-2"></i> TYT & AYT Müfredat Takibi</h2>
+          <div class="flex p-1 bg-slate-900 rounded-xl border border-slate-800">
+            <button id="tab-tyt" onclick="switchExamTab('tyt')" class="px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white">TYT Müfredatı</button>
+            <button id="tab-ayt" onclick="switchExamTab('ayt')" class="px-5 py-2 text-xs font-bold rounded-lg text-slate-400">AYT Müfredatı</button>
+          </div>
+        </div>
+        <div id="subject-selector" class="flex gap-2 overflow-x-auto pb-2"></div>
+        <div class="space-y-4">
+          <div class="flex justify-between text-xs text-slate-400">
+            <span id="active-subject-title" class="font-bold text-slate-200">Matematik Konuları</span>
+            <span id="progress-text">0 / 0 Tamamlandı (%0)</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-600 to-emerald-400 w-0 transition-all duration-300"></div>
+          </div>
+          <div id="topic-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+        </div>
+      </section>
+    </div>
+
   </main>
 
   <!-- İLETİŞİM & FOOTER -->
@@ -104,11 +210,11 @@
     <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
       <div>
         <p class="font-semibold text-slate-300">YKS Portal &copy; 2026</p>
-        <p>YKS Hazırlık Sürecinde Kişisel Çalışma Paneli</p>
+        <p>YKS Hazırlık Sürecinde Kişisel Çalışma ve Analiz Paneli</p>
       </div>
       <div class="flex items-center gap-2 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
         <i class="fa-solid fa-envelope text-brand-500"></i>
-        <span>İletişim: <a href="mailto:semihkeskin@gmail.com" class="text-slate-200 underline hover:text-brand-500 transition">semihkeskin@gmail.com</a></span>
+        <span>İletişim: <a href="mailto:semihkeskin@gmail.com" class="text-slate-200 underline hover:text-brand-500 transition">semihkeskinw@gmail.com</a></span>
       </div>
     </div>
   </footer>
@@ -137,7 +243,7 @@
     </div>
   </div>
 
-  <!-- FIREBASE SCRIPT -->
+  <!-- FIREBASE MODÜLÜ -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -167,7 +273,7 @@
       } else {
         profileBar.innerHTML = `
           <button onclick="window.toggleAuthModal()" class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center gap-2">
-            <i class="fa-solid fa-user"></i> Giriş Yap / Kaydol
+            <i class="fa-solid fa-user"></i> Giriş Yap
           </button>
         `;
       }
@@ -176,11 +282,7 @@
     window.handleAuth = async (type) => {
       const email = document.getElementById('auth-email').value;
       const pass = document.getElementById('auth-password').value;
-      
-      if (!email || !pass) {
-        alert("Lütfen e-posta ve şifrenizi girin.");
-        return;
-      }
+      if (!email || !pass) { alert("Lütfen bilgilerinizi girin."); return; }
 
       try {
         if (type === 'login') {
@@ -188,19 +290,34 @@
           alert("Giriş başarılı!");
         } else {
           await createUserWithEmailAndPassword(auth, email, pass);
-          alert("Hesap başarıyla oluşturuldu ve giriş yapıldı!");
+          alert("Hesap başarıyla oluşturuldu!");
         }
         window.toggleAuthModal();
-      } catch (err) {
-        alert("Hata: " + err.message);
-      }
+      } catch (err) { alert("Hata: " + err.message); }
     };
 
     window.logout = () => signOut(auth);
   </script>
 
-  <!-- UYGULAMA MANTIĞI -->
+  <!-- UYGULAMA MANTIĞI & GRAFİK SİSTEMİ -->
   <script>
+    // SEKME GEÇİŞLERİ
+    function switchMainTab(tab) {
+      const tabs = ['dashboard', 'net-tracker', 'exam-log', 'curriculum'];
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t}-content`).classList.add('hidden');
+        const btn = document.getElementById(`nav-${t}`);
+        if(btn) btn.className = "px-4 py-2 rounded-lg text-slate-400 hover:text-white transition";
+      });
+
+      document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`nav-${tab}`);
+      if(activeBtn) activeBtn.className = "px-4 py-2 rounded-lg bg-brand-600 text-white transition";
+      
+      if(tab === 'net-tracker') renderChart();
+    }
+
+    // MÜFREDAT VERİLERİ
     const curriculum = {
       tyt: {
         "Matematik": ["Temel Kavramlar", "Sayı Basamakları", "Bölme - Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Sayı-Kesir Problemleri", "Yaş Problemleri", "Yüzde-Kâr-Zarar Problemleri", "Karışım Problemleri", "Hız Problemleri", "Kümeler - Mantık", "Fonksiyonlar", "Permütasyon - Kombinasyon", "Olasılık"],
@@ -219,7 +336,94 @@
 
     let currentExam = 'tyt', currentSubject = 'Matematik';
     let completedTopics = JSON.parse(localStorage.getItem('yks_completed_topics') || '{}');
+    let netHistory = JSON.parse(localStorage.getItem('yks_net_history') || '[]');
+    let mistakes = JSON.parse(localStorage.getItem('yks_mistakes') || '[]');
 
+    // GRAFİK SİSTEMİ
+    let myChart = null;
+    function renderChart() {
+      const ctx = document.getElementById('netChart').getContext('2d');
+      if (myChart) myChart.destroy();
+
+      const labels = netHistory.map(n => n.name);
+      const data = netHistory.map(n => n.total);
+
+      myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.length ? labels : ['Örnek Deneme 1', 'Örnek Deneme 2'],
+          datasets: [{
+            label: 'Toplam Net',
+            data: data.length ? data : [65, 78.5],
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.2)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    function addNetRecord() {
+      const type = document.getElementById('net-exam-type').value;
+      const name = document.getElementById('net-exam-name').value;
+      const total = parseFloat(document.getElementById('net-total').value);
+
+      if(!name || isNaN(total)) { alert("Lütfen deneme adı ve netini tam girin."); return; }
+
+      netHistory.push({ type, name, total });
+      localStorage.setItem('yks_net_history', JSON.stringify(netHistory));
+      alert("Net başarıyla kaydedildi!");
+      document.getElementById('net-exam-name').value = '';
+      document.getElementById('net-total').value = '';
+      renderChart();
+    }
+
+    // YANLIŞ NOTU SİSTEMİ
+    function addMistakeNote() {
+      const subj = document.getElementById('mistake-subject').value;
+      const reason = document.getElementById('mistake-reason').value;
+      if(!subj) return;
+
+      mistakes.push({ subj, reason, date: new Date().toLocaleDateString('tr-TR') });
+      localStorage.setItem('yks_mistakes', JSON.stringify(mistakes));
+      renderMistakes();
+      document.getElementById('mistake-subject').value = '';
+    }
+
+    function renderMistakes() {
+      const container = document.getElementById('mistake-list');
+      if(!mistakes.length) return;
+      container.innerHTML = mistakes.map((m, i) => `
+        <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-bold text-white">${m.subj}</p>
+            <span class="text-xs text-amber-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${m.reason}</span>
+          </div>
+          <span class="text-[10px] text-slate-500">${m.date}</span>
+        </div>
+      `).join('');
+    }
+
+    // SORU SAYAÇI
+    function updateQuestionTracker() {
+      const target = parseInt(document.getElementById('daily-target').value) || 1;
+      const solved = parseInt(document.getElementById('daily-solved').value) || 0;
+      const pct = Math.min(100, Math.round((solved / target) * 100));
+
+      document.getElementById('target-percentage').innerText = `%${pct}`;
+      document.getElementById('target-bar').style.width = `${pct}%`;
+    }
+
+    // MÜFREDAT YÖNETİMİ
     function loadSubjects() {
       const selector = document.getElementById('subject-selector');
       selector.innerHTML = '';
@@ -266,10 +470,8 @@
     function switchExamTab(exam) {
       currentExam = exam;
       currentSubject = Object.keys(curriculum[currentExam])[0];
-      
       document.getElementById('tab-tyt').className = exam === 'tyt' ? 'px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white' : 'px-5 py-2 text-xs font-bold rounded-lg text-slate-400';
       document.getElementById('tab-ayt').className = exam === 'ayt' ? 'px-5 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white' : 'px-5 py-2 text-xs font-bold rounded-lg text-slate-400';
-
       loadSubjects(); loadTopics();
     }
 
@@ -302,6 +504,8 @@
     window.onload = () => {
       loadSubjects(); 
       loadTopics();
+      renderMistakes();
+      updateQuestionTracker();
     };
   </script>
 </body>
